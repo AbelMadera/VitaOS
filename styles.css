@@ -23,7 +23,7 @@
 
     --ringTrack: rgba(15, 23, 42, .10);
 
-    --pad: 16px;
+    --pad: 14px;
     --maxw: 440px;
 
     --blur: 18px;
@@ -72,13 +72,16 @@ body {
         radial-gradient(800px 520px at 55% 110%, rgba(255, 159, 10, .10), transparent 55%),
         linear-gradient(180deg, var(--bg0), var(--bg1));
     -webkit-font-smoothing: antialiased;
+    text-size-adjust: 100%;
+    -webkit-text-size-adjust: 100%;
+    overflow-x: hidden;
     padding-bottom: calc(92px + env(safe-area-inset-bottom));
 }
 
 .app {
     width: min(var(--maxw), 100%);
     margin: 0 auto;
-    padding: calc(12px + env(safe-area-inset-top)) var(--pad) 18px;
+    padding: calc(10px + env(safe-area-inset-top)) var(--pad) 16px;
 }
 
 .view {
@@ -118,14 +121,15 @@ body {
     margin: 0;
     font-weight: 800;
     letter-spacing: -0.03em;
-    font-size: 30px;
+    font-size: clamp(1.6rem, 6.2vw, 1.9rem);
     line-height: 1.08;
+    text-wrap: balance;
 }
 
 .sub {
     margin: 6px 0 0;
     color: var(--muted);
-    font-size: 14px;
+    font-size: clamp(0.82rem, 3.4vw, 0.9rem);
     line-height: 1.35;
 }
 
@@ -157,7 +161,7 @@ body {
 
 .stack {
     display: grid;
-    gap: 12px;
+    gap: 10px;
 }
 
 .stack.smallGap {
@@ -171,7 +175,7 @@ body {
     box-shadow: var(--shadow);
     backdrop-filter: blur(var(--blur));
     -webkit-backdrop-filter: blur(var(--blur));
-    padding: 16px;
+    padding: 14px;
     position: relative;
     overflow: hidden;
 }
@@ -197,6 +201,10 @@ body {
     gap: 12px;
 }
 
+.row> :first-child {
+    min-width: 0;
+}
+
 .kicker {
     font-size: 12px;
     letter-spacing: 0.02em;
@@ -207,16 +215,17 @@ body {
 
 .h2 {
     margin: 6px 0 0;
-    font-size: 18px;
+    font-size: clamp(1rem, 4.6vw, 1.12rem);
     font-weight: 780;
     letter-spacing: -0.02em;
     line-height: 1.12;
+    text-wrap: balance;
 }
 
 .meta {
     margin: 6px 0 0;
     color: var(--muted);
-    font-size: 13px;
+    font-size: clamp(0.78rem, 3.2vw, 0.84rem);
     line-height: 1.35;
 }
 
@@ -231,14 +240,14 @@ body {
 .rings {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 12px;
+    gap: 10px;
 }
 
 .ringTile {
     border-radius: var(--radius-lg);
     border: 1px solid var(--stroke);
     background: rgba(255, 255, 255, .04);
-    padding: 14px;
+    padding: 12px;
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -253,7 +262,7 @@ body {
 }
 
 .ringBig {
-    font-size: 16px;
+    font-size: clamp(0.92rem, 3.9vw, 1rem);
     font-weight: 820;
     letter-spacing: -0.02em;
 }
@@ -265,8 +274,8 @@ body {
 }
 
 .ringSvg {
-    width: 52px;
-    height: 52px;
+    width: clamp(42px, 14.8vw, 52px);
+    height: clamp(42px, 14.8vw, 52px);
     flex: 0 0 auto;
 }
 
@@ -287,9 +296,11 @@ body {
     border: 1px solid var(--stroke);
     background: rgba(255, 255, 255, .05);
     color: var(--muted);
-    font-size: 12px;
+    font-size: 11px;
     font-weight: 760;
-    white-space: nowrap;
+    white-space: normal;
+    text-align: center;
+    line-height: 1.2;
 }
 
 .badge.good {
@@ -316,7 +327,7 @@ body {
     background: rgba(255, 255, 255, .04);
     border-radius: 999px;
     padding: 10px 12px;
-    font-size: 13px;
+    font-size: 12px;
     font-weight: 720;
     color: var(--text);
     display: inline-flex;
@@ -350,9 +361,10 @@ body {
     width: 100%;
     margin-top: 14px;
     border: 0;
-    border-radius: 18px;
+    border-radius: 16px;
     padding: 14px 16px;
-    font-size: 16px;
+    min-height: 48px;
+    font-size: 15px;
     font-weight: 840;
     letter-spacing: -0.02em;
     color: white;
@@ -372,6 +384,7 @@ body {
     color: var(--text);
     font-weight: 800;
     padding: 10px 12px;
+    min-height: 42px;
     border-radius: 14px;
     cursor: pointer;
     transition: transform 140ms var(--ease);
@@ -382,7 +395,7 @@ body {
 }
 
 .item {
-    padding: 12px;
+    padding: 11px;
     border-radius: var(--radius-md);
     border: 1px solid var(--stroke);
     background: rgba(255, 255, 255, .04);
@@ -401,7 +414,7 @@ body {
 .itemTitle {
     font-weight: 780;
     letter-spacing: -0.02em;
-    font-size: 14px;
+    font-size: 13px;
     margin: 0;
     line-height: 1.2;
 }
@@ -409,7 +422,7 @@ body {
 .itemSub {
     margin: 4px 0 0;
     color: var(--muted);
-    font-size: 12px;
+    font-size: 11px;
     font-weight: 650;
 }
 
@@ -423,7 +436,7 @@ body {
 
 .seg {
     display: flex;
-    gap: 6px;
+    gap: 4px;
     padding: 6px;
     border-radius: 18px;
     border: 1px solid var(--stroke);
@@ -435,8 +448,9 @@ body {
 .seg button {
     flex: 1;
     border: 0;
-    border-radius: 14px;
-    padding: 10px 10px;
+    border-radius: 12px;
+    padding: 10px 8px;
+    min-height: 42px;
     font-weight: 760;
     font-size: 13px;
     color: var(--muted);
@@ -463,30 +477,31 @@ html[data-theme="dark"] .seg button.active {
     left: 50%;
     transform: translateX(-50%);
     bottom: calc(10px + env(safe-area-inset-bottom));
-    width: min(var(--maxw), calc(100% - 22px));
-    border-radius: 26px;
+    width: min(var(--maxw), calc(100% - 14px));
+    border-radius: 20px;
     border: 1px solid var(--stroke);
     background: linear-gradient(180deg, var(--glass2), var(--glass));
     box-shadow: var(--shadow);
     backdrop-filter: blur(calc(var(--blur) + 6px));
     -webkit-backdrop-filter: blur(calc(var(--blur) + 6px));
     display: flex;
-    padding: 10px 10px;
-    gap: 8px;
+    padding: 8px;
+    gap: 4px;
     z-index: 50;
 }
 
 .tab {
     flex: 1;
-    border-radius: 18px;
-    padding: 10px 8px;
+    min-width: 0;
+    border-radius: 14px;
+    padding: 9px 4px;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    gap: 6px;
+    gap: 4px;
     color: var(--muted);
-    font-size: 11px;
+    font-size: 10px;
     font-weight: 860;
     cursor: pointer;
     user-select: none;
@@ -503,7 +518,7 @@ html[data-theme="dark"] .seg button.active {
 }
 
 .tabIcon {
-    font-size: 16px;
+    font-size: 15px;
     line-height: 1;
 }
 
@@ -527,7 +542,7 @@ html[data-theme="dark"] .seg button.active {
     left: 50%;
     transform: translateX(-50%) translateY(110%);
     bottom: 0;
-    width: min(var(--maxw), 100%);
+    width: min(var(--maxw), calc(100% - 8px));
     border-radius: 28px 28px 0 0;
     border: 1px solid var(--stroke);
     background: linear-gradient(180deg, var(--glass2), var(--glass));
@@ -543,7 +558,7 @@ html[data-theme="dark"] .seg button.active {
 }
 
 .sheetHeader {
-    padding: 14px 16px 10px;
+    padding: 12px 14px 8px;
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -564,7 +579,7 @@ html[data-theme="dark"] .seg button.active {
 }
 
 .sheetBody {
-    padding: 0 16px 16px;
+    padding: 0 14px 14px;
     display: grid;
     gap: 12px;
 }
@@ -583,7 +598,8 @@ html[data-theme="dark"] .seg button.active {
     border: 1px solid var(--stroke);
     background: rgba(255, 255, 255, .05);
     padding: 12px 12px;
-    font-size: 14px;
+    min-height: 46px;
+    font-size: 16px;
     font-weight: 700;
     color: var(--text);
     outline: none;
@@ -620,5 +636,82 @@ html[data-theme="dark"] .seg button.active {
     * {
         transition: none !important;
         animation: none !important;
+    }
+}
+
+@media (max-width: 380px) {
+    :root {
+        --pad: 10px;
+    }
+
+    .header {
+        margin-bottom: 10px;
+    }
+
+    .card {
+        border-radius: 20px;
+        padding: 12px;
+    }
+
+    .row {
+        align-items: flex-start;
+        flex-wrap: wrap;
+        gap: 8px;
+    }
+
+    .row .badge,
+    .row .ghostBtn {
+        margin-top: 2px;
+    }
+
+    .rings {
+        grid-template-columns: 1fr;
+    }
+
+    .ringTile {
+        gap: 10px;
+    }
+
+    .tab {
+        font-size: 9px;
+        padding-inline: 3px;
+    }
+
+    .tabIcon {
+        font-size: 14px;
+    }
+
+    .item {
+        align-items: flex-start;
+    }
+
+    .itemRight {
+        align-items: flex-end;
+    }
+}
+
+@media (min-width: 620px) {
+    :root {
+        --pad: 18px;
+    }
+
+    .app {
+        padding-top: calc(14px + env(safe-area-inset-top));
+    }
+
+    .card {
+        padding: 16px;
+    }
+
+    .title {
+        font-size: 2rem;
+    }
+
+    .h2 {
+        font-size: 1.14rem;
+    }
+
+    .tab {
+        font-size: 11px;
     }
 }
