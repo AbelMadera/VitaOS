@@ -3,7 +3,7 @@
    - Habits (daily toggle + streak)
    - Assignments (due dates + complete)
    - Focus timer logs study minutes
-   - Insights for today + week
+   - Appearance presets (accent + light/dark)
    - localStorage persistence
    ========================== */
 
@@ -51,6 +51,13 @@ function formatFriendlyDate(iso) {
 
 /* ---------- Storage ---------- */
 const KEY = "lifeos_v1";
+const COLOR_PRESETS = [
+    { id: "ocean", label: "Ocean", rgb: "10, 132, 255" },
+    { id: "mint", label: "Mint", rgb: "52, 199, 89" },
+    { id: "sunset", label: "Sunset", rgb: "255, 159, 10" },
+    { id: "rose", label: "Rose", rgb: "255, 59, 48" },
+    { id: "violet", label: "Violet", rgb: "99, 102, 241" },
+];
 function uid() { return Math.random().toString(16).slice(2) + Date.now().toString(16); }
 
 function loadState() {
@@ -62,6 +69,7 @@ function loadState() {
     const today = toISODate(new Date());
     return {
         theme: localStorage.getItem("lifeos_theme") || "light",
+        palette: localStorage.getItem("lifeos_palette") || "ocean",
         studyGoal: 120,
         studyLog: {
             // isoDate: minutes
@@ -85,23 +93,130 @@ function saveState() {
 
 /* ---------- App State ---------- */
 const state = loadState();
+if (!state.theme) state.theme = "light";
+if (!state.palette || !COLOR_PRESETS.some(p => p.id === state.palette)) state.palette = "ocean";
 
 /* ---------- Theme ---------- */
-function setTheme(t) {
+function getPalette(id) {
+    return COLOR_PRESETS.find(p => p.id === id) || COLOR_PRESETS[0];
+}
+
+function updateAppearanceButton() {
+    const preset = getPalette(state.palette);
+    const btn = $("#themeBtn");
+    btn.style.color = `rgb(${preset.rgb})`;
+    btn.innerHTML = `<svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+      <circle cx="12" cy="12" r="2.8" fill="currentColor"></circle>
+      <path d="M12 3.5v2.1M12 18.4v2.1M3.5 12h2.1M18.4 12h2.1M5.9 5.9l1.5 1.5M16.6 16.6l1.5 1.5M5.9 18.1l1.5-1.5M16.6 7.4l1.5-1.5"
+            stroke="currentColor" stroke-width="1.8" stroke-linecap="round" opacity=".9"></path>
+    </svg>`;
+}
+
+function setTheme(t, persist = true) {
     document.documentElement.setAttribute("data-theme", t === "dark" ? "dark" : "light");
     state.theme = t;
-    localStorage.setItem("lifeos_theme", t);
-    // icon
-    $("#themeBtn").innerHTML = t === "dark"
-        ? `<svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-         <path d="M21 14.5A8.5 8.5 0 0 1 9.5 3a7 7 0 1 0 11.5 11.5Z" stroke="currentColor" stroke-width="2"/>
-       </svg>`
-        : `<svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-         <path d="M12 18a6 6 0 1 0 0-12 6 6 0 0 0 0 12Z" stroke="currentColor" stroke-width="2" opacity=".9"/>
-         <path d="M12 2v2M12 20v2M4 12H2M22 12h-2M19.1 4.9l-1.4 1.4M6.3 17.7l-1.4 1.4M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"
-               stroke="currentColor" stroke-width="2" opacity=".55"/>
-       </svg>`;
+    if (persist) localStorage.setItem("lifeos_theme", t);
+    const themeColor = $('meta[name="theme-color"]');
+    if (themeColor) {
+        themeColor.setAttribute("content", t === "dark" ? "#070a12" : "#f6f7fb");
+    }
+    if (persist) saveState();
+}
+
+function setPalette(id, persist = true) {
+    const preset = getPalette(id);
+    state.palette = preset.id;
+    document.documentElement.style.setProperty("--accent-rgb", preset.rgb);
+    if (persist) {
+        localStorage.setItem("lifeos_palette", preset.id);
+        saveState();
+    }
+    updateAppearanceButton();
+}
+
+function syncTabbarClearance() {
+    const bar = $(".tabbar");
+    if (!bar) return;
+    const h = Math.ceil(bar.getBoundingClientRect().height);
+    document.documentElement.style.setProperty("--tabbar-height", `${h}px`);
+}
+
+function syncAppearanceSheet() {
+    if (!sheet.classList.contains("open")) return;
+    if ($("#sheetTitle")?.textContent !== "Appearance") return;
+    $$(".modeBtn", sheetForm).forEach(btn => {
+        btn.classList.toggle("active", btn.dataset.mode === state.theme);
+    });
+    $$(".swatchBtn", sheetForm).forEach(btn => {
+        btn.classList.toggle("active", btn.dataset.palette === state.palette);
+    });
+    const modeHint = $("#modeHint");
+    if (modeHint) modeHint.textContent = state.theme === "dark" ? "Dark mode active" : "Light mode active";
+    const colorHint = $("#colorHint");
+    if (colorHint) colorHint.textContent = `Preset: ${getPalette(state.palette).label}`;
+}
+
+function openAppearanceSheet() {
+    const swatches = COLOR_PRESETS.map(p => `
+      <button
+        class="swatchBtn${p.id === state.palette ? " active" : ""}"
+        type="button"
+        data-palette="${p.id}"
+        aria-label="${p.label}"
+        title="${p.label}"
+        style="background: linear-gradient(180deg, rgb(${p.rgb}), color-mix(in srgb, rgb(${p.rgb}) 78%, black 22%));"
+      ></button>
+    `).join("");
+
+    sheetForm.innerHTML = `
+      <div class="field">
+        <label>Mode</label>
+        <div class="modeRow">
+          <button class="modeBtn${state.theme === "light" ? " active" : ""}" type="button" data-mode="light">Light</button>
+          <button class="modeBtn${state.theme === "dark" ? " active" : ""}" type="button" data-mode="dark">Dark</button>
+        </div>
+        <div class="meta" id="modeHint">${state.theme === "dark" ? "Dark mode active" : "Light mode active"}</div>
+      </div>
+
+      <div class="field">
+        <label>Accent Color</label>
+        <div class="paletteGrid">${swatches}</div>
+        <div class="meta" id="colorHint">Preset: ${getPalette(state.palette).label}</div>
+      </div>
+
+      <div class="sheetActions">
+        <button class="primary" id="appearanceDone" type="button">Done</button>
+      </div>
+    `;
+
+    $$(".modeBtn", sheetForm).forEach(btn => {
+        btn.addEventListener("click", () => {
+            setTheme(btn.dataset.mode);
+            syncAppearanceSheet();
+        });
+    });
+    $$(".swatchBtn", sheetForm).forEach(btn => {
+        btn.addEventListener("click", () => {
+            setPalette(btn.dataset.palette);
+            syncAppearanceSheet();
+        });
+    });
+    $("#appearanceDone")?.addEventListener("click", closeSheet);
+}
+
+function setThemeAndPalette() {
+    setTheme(state.theme || "light", false);
+    setPalette(state.palette || "ocean", false);
     saveState();
+}
+
+/* ---------- Appearance ---------- */
+function openAppearance() {
+    $("#sheetTitle").textContent = "Appearance";
+    $("#sheetSub").textContent = "Preset colors + light/dark mode";
+    sheetForm.innerHTML = "";
+    openAppearanceSheet();
+    sheetForm.onsubmit = null;
 }
 
 /* ---------- Rings ---------- */
@@ -210,26 +325,22 @@ function addStudyMinutes(isoDate, minutes) {
     saveState();
 }
 
-function studyWeekTotal() {
-    const today = parseISODate(toISODate(new Date()));
-    const s = startOfWeek(today);
-    let total = 0;
-    for (let i = 0; i < 7; i++) {
-        const d = new Date(s);
-        d.setDate(d.getDate() + i);
-        const iso = toISODate(d);
-        total += getStudyMinutes(iso);
-    }
-    return total;
-}
-
 /* ---------- Bottom Sheet ---------- */
 const sheet = $("#sheet");
 const sheetBackdrop = $("#sheetBackdrop");
 const sheetForm = $("#sheetForm");
 
 function openSheet(type) {
-    // type: addHabit | addAssignment
+    // type: addHabit | addAssignment | appearance
+    if (type === "appearance") {
+        openAppearance();
+        sheetBackdrop.classList.add("open");
+        sheet.classList.add("open");
+        sheet.setAttribute("aria-hidden", "false");
+        sheetBackdrop.setAttribute("aria-hidden", "false");
+        return;
+    }
+
     $("#sheetTitle").textContent = type === "addHabit" ? "Add Habit" : "Add Assignment";
     $("#sheetSub").textContent = type === "addHabit"
         ? "Daily habit • streak-ready"
@@ -318,6 +429,7 @@ function closeSheet() {
 function setView(name) {
     $$(".view").forEach(v => v.classList.toggle("active", v.dataset.view === name));
     $$(".tab").forEach(t => t.classList.toggle("active", t.dataset.tab === name));
+    syncTabbarClearance();
 }
 
 /* ---------- Focus Timer ---------- */
@@ -469,10 +581,10 @@ function renderToday() {
         });
     }
 
-    // Assignment preview (top 3 pending)
+    // Assignment preview (latest 1 pending)
     const preview = $("#todayAssignmentPreview");
     preview.innerHTML = "";
-    const pending = sortedAssignments().filter(a => !a.done).slice(0, 3);
+    const pending = state.assignments.filter(a => !a.done).slice(0, 1);
     if (pending.length === 0) {
         const e = document.createElement("div");
         e.className = "meta";
@@ -617,47 +729,13 @@ function renderSessions() {
     });
 }
 
-function renderInsights() {
-    const isoToday = toISODate(new Date());
-    const studyToday = getStudyMinutes(isoToday);
-    const totalHabits = state.habits.length || 0;
-    const doneHabits = state.habits.filter(h => habitDoneToday(h, isoToday)).length;
-    const pct = totalHabits ? Math.round((doneHabits / totalHabits) * 100) : 0;
-
-    $("#insStudy").textContent = `${studyToday} minutes today`;
-    $("#insStudyBadge").textContent = `${studyToday}m`;
-
-    $("#insHabits").textContent = totalHabits ? `${pct}% today` : "Add habits to track";
-    $("#insHabitBadge").textContent = totalHabits ? `${pct}%` : "—";
-
-    const weekMinutes = studyWeekTotal();
-    $("#insWeek").textContent = `${weekMinutes} study minutes this week`;
-    $("#insWeekBadge").textContent = `${weekMinutes}m`;
-
-    $("#insightHeadline").textContent =
-        totalHabits === 0 ? "Add 1 habit." :
-            pct >= 80 ? "You’re in rhythm." :
-                pct >= 50 ? "Solid momentum." : "Start with one win.";
-
-    $("#insightMeta").textContent =
-        studyToday >= 60 ? "Focus is trending up." :
-            "One short session changes the day.";
-
-    // simple delta (demo-ish): compare today vs yesterday (study minutes)
-    const y = new Date(); y.setDate(y.getDate() - 1);
-    const isoY = toISODate(y);
-    const yMin = getStudyMinutes(isoY);
-    const delta = yMin === 0 ? (studyToday > 0 ? 100 : 0) : Math.round(((studyToday - yMin) / yMin) * 100);
-    $("#insightDelta").textContent = `${delta >= 0 ? "+" : ""}${delta}%`;
-}
-
 /* ---------- Render All ---------- */
 function renderAll() {
     renderToday();
     renderSchool();
     renderHabits();
     renderSessions();
-    renderInsights();
+    syncTabbarClearance();
 }
 
 /* ---------- Events ---------- */
@@ -665,9 +743,9 @@ function wireEvents() {
     // tabs
     $$(".tab").forEach(t => t.addEventListener("click", () => setView(t.dataset.tab)));
 
-    // theme toggle
+    // appearance
     $("#themeBtn").addEventListener("click", () => {
-        setTheme(state.theme === "dark" ? "light" : "dark");
+        openSheet("appearance");
     });
 
     // open sheet buttons
@@ -681,6 +759,7 @@ function wireEvents() {
 
     // Today -> Focus
     $("#startFocus").addEventListener("click", () => setView("focus"));
+    $("#seeMoreAssignments").addEventListener("click", () => setView("school"));
 
     // timer length
     $$(".seg button[data-len]").forEach(btn => {
@@ -707,11 +786,15 @@ function wireEvents() {
     window.addEventListener("keydown", (e) => {
         if (e.key === "Escape") closeSheet();
     });
+    window.addEventListener("resize", syncTabbarClearance);
+    if (window.visualViewport) {
+        window.visualViewport.addEventListener("resize", syncTabbarClearance);
+    }
 }
 
 /* ---------- Init ---------- */
 function init() {
-    setTheme(state.theme || "light");
+    setThemeAndPalette();
     wireEvents();
     renderAll();
 }

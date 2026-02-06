@@ -5,9 +5,11 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
     <title>VitaOS</title>
+    <meta name="theme-color" content="#f6f7fb" />
     <link rel="apple-touch-icon" href="images/app-icon.png" />
     <link rel="icon" type="image/png" href="images/app-icon.png" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
     <meta name="apple-mobile-web-app-title" content="VitaOS" />
     <link rel="stylesheet" href="styles.css" />
 </head>
@@ -23,7 +25,7 @@
                     <p class="sub" id="dateLine">—</p>
                 </div>
 
-                <button class="iconBtn" id="themeBtn" aria-label="Toggle theme"></button>
+                <button class="iconBtn" id="themeBtn" aria-label="Open appearance settings"></button>
             </header>
 
             <div class="stack">
@@ -99,6 +101,7 @@
                     </div>
 
                     <div class="stack smallGap" id="todayAssignmentPreview"></div>
+                    <button class="ghostBtn seeMoreBtn" id="seeMoreAssignments" type="button">See more</button>
                 </div>
             </div>
         </section>
@@ -208,65 +211,6 @@
             </div>
         </section>
 
-        <!-- INSIGHTS -->
-        <section class="view" data-view="insights">
-            <header class="header">
-                <div class="titleWrap">
-                    <h1 class="title">Insights</h1>
-                    <p class="sub">Trends without guilt.</p>
-                </div>
-            </header>
-
-            <div class="stack">
-                <div class="card">
-                    <div class="row">
-                        <div>
-                            <div class="kicker">Today</div>
-                            <div class="h2" id="insightHeadline">—</div>
-                            <div class="meta" id="insightMeta">—</div>
-                        </div>
-                        <span class="badge good" id="insightDelta">+0%</span>
-                    </div>
-
-                    <div class="spacer"></div>
-
-                    <div class="item">
-                        <div>
-                            <p class="itemTitle">Study minutes</p>
-                            <p class="itemSub" id="insStudy">0 minutes</p>
-                        </div>
-                        <div class="itemRight">
-                            <span class="badge" id="insStudyBadge">0m</span>
-                        </div>
-                    </div>
-
-                    <div class="smallSpacer"></div>
-
-                    <div class="item">
-                        <div>
-                            <p class="itemTitle">Habit completion</p>
-                            <p class="itemSub" id="insHabits">0%</p>
-                        </div>
-                        <div class="itemRight">
-                            <span class="badge" id="insHabitBadge">0%</span>
-                        </div>
-                    </div>
-
-                    <div class="smallSpacer"></div>
-
-                    <div class="item">
-                        <div>
-                            <p class="itemTitle">This week</p>
-                            <p class="itemSub" id="insWeek">—</p>
-                        </div>
-                        <div class="itemRight">
-                            <span class="badge" id="insWeekBadge">—</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
-
     </main>
 
     <!-- Floating tab bar -->
@@ -275,7 +219,6 @@
         <div class="tab" data-tab="school"><span class="tabIcon">≡</span>School</div>
         <div class="tab" data-tab="habits"><span class="tabIcon">✓</span>Habits</div>
         <div class="tab" data-tab="focus"><span class="tabIcon">◷</span>Focus</div>
-        <div class="tab" data-tab="insights"><span class="tabIcon">▮▮</span>Insights</div>
     </nav>
 
     <!-- Bottom Sheet -->
