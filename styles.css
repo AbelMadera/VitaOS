@@ -1,0 +1,624 @@
+:root {
+    --bg0: #f6f7fb;
+    --bg1: #ffffff;
+
+    --text: rgba(16, 24, 40, .92);
+    --muted: rgba(16, 24, 40, .56);
+
+    --glass: rgba(255, 255, 255, .68);
+    --glass2: rgba(255, 255, 255, .78);
+    --stroke: rgba(15, 23, 42, .10);
+
+    --shadow: 0 16px 40px rgba(2, 6, 23, .12);
+    --shadow2: 0 10px 26px rgba(2, 6, 23, .10);
+
+    --radius-xl: 26px;
+    --radius-lg: 20px;
+    --radius-md: 16px;
+
+    --accent: #0a84ff;
+    --good: #34c759;
+    --warn: #ff9f0a;
+    --bad: #ff3b30;
+
+    --ringTrack: rgba(15, 23, 42, .10);
+
+    --pad: 16px;
+    --maxw: 440px;
+
+    --blur: 18px;
+    --ease: cubic-bezier(.2, .8, .2, 1);
+    --tap: scale(.985);
+}
+
+html[data-theme="dark"] {
+    --bg0: #070a12;
+    --bg1: #0b1020;
+
+    --text: rgba(255, 255, 255, .92);
+    --muted: rgba(255, 255, 255, .60);
+
+    --glass: rgba(255, 255, 255, .07);
+    --glass2: rgba(255, 255, 255, .10);
+    --stroke: rgba(255, 255, 255, .12);
+
+    --shadow: 0 18px 44px rgba(0, 0, 0, .45);
+    --shadow2: 0 12px 28px rgba(0, 0, 0, .38);
+
+    --ringTrack: rgba(255, 255, 255, .14);
+
+    --accent: #0a84ff;
+    --good: #34c759;
+    --warn: #ff9f0a;
+    --bad: #ff453a;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+html,
+body {
+    height: 100%;
+}
+
+body {
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", system-ui, sans-serif;
+    color: var(--text);
+    background:
+        radial-gradient(1100px 700px at 15% -10%, rgba(10, 132, 255, .18), transparent 55%),
+        radial-gradient(900px 600px at 105% 5%, rgba(52, 199, 89, .12), transparent 55%),
+        radial-gradient(800px 520px at 55% 110%, rgba(255, 159, 10, .10), transparent 55%),
+        linear-gradient(180deg, var(--bg0), var(--bg1));
+    -webkit-font-smoothing: antialiased;
+    padding-bottom: calc(92px + env(safe-area-inset-bottom));
+}
+
+.app {
+    width: min(var(--maxw), 100%);
+    margin: 0 auto;
+    padding: calc(12px + env(safe-area-inset-top)) var(--pad) 18px;
+}
+
+.view {
+    display: none;
+    animation: fadeIn 220ms var(--ease);
+}
+
+.view.active {
+    display: block;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(6px);
+    }
+
+    to {
+        opacity: 1;
+        transform: none;
+    }
+}
+
+.header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 12px;
+    margin: 4px 0 12px;
+}
+
+.titleWrap {
+    min-width: 0;
+}
+
+.title {
+    margin: 0;
+    font-weight: 800;
+    letter-spacing: -0.03em;
+    font-size: 30px;
+    line-height: 1.08;
+}
+
+.sub {
+    margin: 6px 0 0;
+    color: var(--muted);
+    font-size: 14px;
+    line-height: 1.35;
+}
+
+.iconBtn {
+    width: 44px;
+    height: 44px;
+    display: grid;
+    place-items: center;
+    border-radius: 14px;
+    border: 1px solid var(--stroke);
+    background: linear-gradient(180deg, var(--glass2), var(--glass));
+    box-shadow: var(--shadow2);
+    backdrop-filter: blur(var(--blur));
+    -webkit-backdrop-filter: blur(var(--blur));
+    cursor: pointer;
+    transition: transform 160ms var(--ease);
+    user-select: none;
+}
+
+.iconBtn:active {
+    transform: var(--tap);
+}
+
+.iconBtn.small {
+    width: 40px;
+    height: 40px;
+    border-radius: 12px;
+}
+
+.stack {
+    display: grid;
+    gap: 12px;
+}
+
+.stack.smallGap {
+    gap: 10px;
+}
+
+.card {
+    border-radius: var(--radius-xl);
+    border: 1px solid var(--stroke);
+    background: linear-gradient(180deg, var(--glass2), var(--glass));
+    box-shadow: var(--shadow);
+    backdrop-filter: blur(var(--blur));
+    -webkit-backdrop-filter: blur(var(--blur));
+    padding: 16px;
+    position: relative;
+    overflow: hidden;
+}
+
+.card:before {
+    content: "";
+    position: absolute;
+    inset: -1px;
+    border-radius: inherit;
+    pointer-events: none;
+    background: radial-gradient(700px 180px at 20% 0%, rgba(10, 132, 255, .12), transparent 55%);
+}
+
+.card>* {
+    position: relative;
+    z-index: 1;
+}
+
+.row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+}
+
+.kicker {
+    font-size: 12px;
+    letter-spacing: 0.02em;
+    color: var(--muted);
+    font-weight: 700;
+    text-transform: uppercase;
+}
+
+.h2 {
+    margin: 6px 0 0;
+    font-size: 18px;
+    font-weight: 780;
+    letter-spacing: -0.02em;
+    line-height: 1.12;
+}
+
+.meta {
+    margin: 6px 0 0;
+    color: var(--muted);
+    font-size: 13px;
+    line-height: 1.35;
+}
+
+.spacer {
+    height: 12px;
+}
+
+.smallSpacer {
+    height: 10px;
+}
+
+.rings {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+}
+
+.ringTile {
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--stroke);
+    background: rgba(255, 255, 255, .04);
+    padding: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+}
+
+.ringText {
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.ringBig {
+    font-size: 16px;
+    font-weight: 820;
+    letter-spacing: -0.02em;
+}
+
+.ringSmall {
+    font-size: 12px;
+    color: var(--muted);
+    font-weight: 650;
+}
+
+.ringSvg {
+    width: 52px;
+    height: 52px;
+    flex: 0 0 auto;
+}
+
+.ringSvg .track {
+    stroke: var(--ringTrack);
+}
+
+.ringSvg .bar {
+    stroke-linecap: round;
+    transform: rotate(-90deg);
+    transform-origin: 18px 18px;
+    transition: stroke-dashoffset 420ms var(--ease);
+}
+
+.badge {
+    padding: 8px 10px;
+    border-radius: 999px;
+    border: 1px solid var(--stroke);
+    background: rgba(255, 255, 255, .05);
+    color: var(--muted);
+    font-size: 12px;
+    font-weight: 760;
+    white-space: nowrap;
+}
+
+.badge.good {
+    color: var(--good);
+}
+
+.badge.warn {
+    color: var(--warn);
+}
+
+.badge.bad {
+    color: var(--bad);
+}
+
+.pillRow {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 12px;
+}
+
+.pill {
+    border: 1px solid var(--stroke);
+    background: rgba(255, 255, 255, .04);
+    border-radius: 999px;
+    padding: 10px 12px;
+    font-size: 13px;
+    font-weight: 720;
+    color: var(--text);
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    transition: transform 140ms var(--ease), background 180ms var(--ease);
+    user-select: none;
+}
+
+.pill:active {
+    transform: var(--tap);
+}
+
+.pill .dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 99px;
+    background: rgba(10, 132, 255, .35);
+}
+
+.pill.done {
+    background: rgba(52, 199, 89, .10);
+}
+
+.pill.done .dot {
+    background: rgba(52, 199, 89, .65);
+}
+
+.primary {
+    width: 100%;
+    margin-top: 14px;
+    border: 0;
+    border-radius: 18px;
+    padding: 14px 16px;
+    font-size: 16px;
+    font-weight: 840;
+    letter-spacing: -0.02em;
+    color: white;
+    background: linear-gradient(180deg, rgba(10, 132, 255, 1), rgba(10, 132, 255, .80));
+    box-shadow: 0 14px 28px rgba(10, 132, 255, .22);
+    cursor: pointer;
+    transition: transform 140ms var(--ease);
+}
+
+.primary:active {
+    transform: var(--tap);
+}
+
+.ghostBtn {
+    border: 1px solid var(--stroke);
+    background: rgba(255, 255, 255, .04);
+    color: var(--text);
+    font-weight: 800;
+    padding: 10px 12px;
+    border-radius: 14px;
+    cursor: pointer;
+    transition: transform 140ms var(--ease);
+}
+
+.ghostBtn:active {
+    transform: var(--tap);
+}
+
+.item {
+    padding: 12px;
+    border-radius: var(--radius-md);
+    border: 1px solid var(--stroke);
+    background: rgba(255, 255, 255, .04);
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+    align-items: center;
+    cursor: pointer;
+    user-select: none;
+}
+
+.item:active {
+    transform: var(--tap);
+}
+
+.itemTitle {
+    font-weight: 780;
+    letter-spacing: -0.02em;
+    font-size: 14px;
+    margin: 0;
+    line-height: 1.2;
+}
+
+.itemSub {
+    margin: 4px 0 0;
+    color: var(--muted);
+    font-size: 12px;
+    font-weight: 650;
+}
+
+.itemRight {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 6px;
+    flex: 0 0 auto;
+}
+
+.seg {
+    display: flex;
+    gap: 6px;
+    padding: 6px;
+    border-radius: 18px;
+    border: 1px solid var(--stroke);
+    background: rgba(255, 255, 255, .04);
+    backdrop-filter: blur(var(--blur));
+    -webkit-backdrop-filter: blur(var(--blur));
+}
+
+.seg button {
+    flex: 1;
+    border: 0;
+    border-radius: 14px;
+    padding: 10px 10px;
+    font-weight: 760;
+    font-size: 13px;
+    color: var(--muted);
+    background: transparent;
+    cursor: pointer;
+    transition: transform 140ms var(--ease), background 180ms var(--ease), color 180ms var(--ease);
+}
+
+.seg button:active {
+    transform: var(--tap);
+}
+
+.seg button.active {
+    color: var(--text);
+    background: linear-gradient(180deg, rgba(255, 255, 255, .40), rgba(255, 255, 255, .18));
+}
+
+html[data-theme="dark"] .seg button.active {
+    background: linear-gradient(180deg, rgba(255, 255, 255, .12), rgba(255, 255, 255, .07));
+}
+
+.tabbar {
+    position: fixed;
+    left: 50%;
+    transform: translateX(-50%);
+    bottom: calc(10px + env(safe-area-inset-bottom));
+    width: min(var(--maxw), calc(100% - 22px));
+    border-radius: 26px;
+    border: 1px solid var(--stroke);
+    background: linear-gradient(180deg, var(--glass2), var(--glass));
+    box-shadow: var(--shadow);
+    backdrop-filter: blur(calc(var(--blur) + 6px));
+    -webkit-backdrop-filter: blur(calc(var(--blur) + 6px));
+    display: flex;
+    padding: 10px 10px;
+    gap: 8px;
+    z-index: 50;
+}
+
+.tab {
+    flex: 1;
+    border-radius: 18px;
+    padding: 10px 8px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    color: var(--muted);
+    font-size: 11px;
+    font-weight: 860;
+    cursor: pointer;
+    user-select: none;
+    transition: transform 140ms var(--ease), background 180ms var(--ease), color 180ms var(--ease);
+}
+
+.tab:active {
+    transform: var(--tap);
+}
+
+.tab.active {
+    color: var(--text);
+    background: rgba(255, 255, 255, .10);
+}
+
+.tabIcon {
+    font-size: 16px;
+    line-height: 1;
+}
+
+.sheetBackdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, .35);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 200ms var(--ease);
+    z-index: 80;
+}
+
+.sheetBackdrop.open {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.sheet {
+    position: fixed;
+    left: 50%;
+    transform: translateX(-50%) translateY(110%);
+    bottom: 0;
+    width: min(var(--maxw), 100%);
+    border-radius: 28px 28px 0 0;
+    border: 1px solid var(--stroke);
+    background: linear-gradient(180deg, var(--glass2), var(--glass));
+    box-shadow: var(--shadow);
+    backdrop-filter: blur(calc(var(--blur) + 8px));
+    -webkit-backdrop-filter: blur(calc(var(--blur) + 8px));
+    transition: transform 240ms var(--ease);
+    z-index: 90;
+}
+
+.sheet.open {
+    transform: translateX(-50%) translateY(0);
+}
+
+.sheetHeader {
+    padding: 14px 16px 10px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+}
+
+.sheetTitle {
+    font-size: 16px;
+    font-weight: 900;
+    letter-spacing: -0.02em;
+}
+
+.sheetSub {
+    margin-top: 3px;
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--muted);
+}
+
+.sheetBody {
+    padding: 0 16px 16px;
+    display: grid;
+    gap: 12px;
+}
+
+.field label {
+    display: block;
+    font-size: 12px;
+    font-weight: 800;
+    color: var(--muted);
+    margin-bottom: 6px;
+}
+
+.input {
+    width: 100%;
+    border-radius: 16px;
+    border: 1px solid var(--stroke);
+    background: rgba(255, 255, 255, .05);
+    padding: 12px 12px;
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--text);
+    outline: none;
+}
+
+.sheetActions {
+    display: flex;
+    gap: 10px;
+}
+
+.sheetActions .primary {
+    margin-top: 0;
+}
+
+.dangerBtn {
+    width: 100%;
+    border-radius: 18px;
+    padding: 14px 16px;
+    font-size: 16px;
+    font-weight: 840;
+    letter-spacing: -0.02em;
+    border: 1px solid var(--stroke);
+    background: rgba(255, 59, 48, .10);
+    color: var(--bad);
+    cursor: pointer;
+    transition: transform 140ms var(--ease);
+}
+
+.dangerBtn:active {
+    transform: var(--tap);
+}
+
+@media (prefers-reduced-motion: reduce) {
+    * {
+        transition: none !important;
+        animation: none !important;
+    }
+}

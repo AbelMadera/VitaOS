@@ -1,0 +1,297 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+    <title>LifeOS</title>
+    <link rel="stylesheet" href="styles.css" />
+</head>
+
+<body>
+    <main class="app">
+
+        <!-- TODAY -->
+        <section class="view active" data-view="today">
+            <header class="header">
+                <div class="titleWrap">
+                    <h1 class="title">Today</h1>
+                    <p class="sub" id="dateLine">—</p>
+                </div>
+
+                <button class="iconBtn" id="themeBtn" aria-label="Toggle theme"></button>
+            </header>
+
+            <div class="stack">
+                <div class="card">
+                    <div class="rings">
+                        <div class="ringTile">
+                            <div class="ringText">
+                                <div class="kicker">Study</div>
+                                <div class="ringBig" id="studyText">0 / 120m</div>
+                                <div class="ringSmall" id="studyHint">—</div>
+                            </div>
+                            <svg class="ringSvg" viewBox="0 0 36 36" aria-hidden="true">
+                                <circle class="track" cx="18" cy="18" r="15.5" fill="none" stroke-width="3"></circle>
+                                <circle class="bar" id="studyRing" cx="18" cy="18" r="15.5" fill="none"
+                                    stroke="var(--accent)" stroke-width="3"></circle>
+                            </svg>
+                        </div>
+
+                        <div class="ringTile">
+                            <div class="ringText">
+                                <div class="kicker">Habits</div>
+                                <div class="ringBig" id="habitText">0 / 0</div>
+                                <div class="ringSmall" id="habitHint">—</div>
+                            </div>
+                            <svg class="ringSvg" viewBox="0 0 36 36" aria-hidden="true">
+                                <circle class="track" cx="18" cy="18" r="15.5" fill="none" stroke-width="3"></circle>
+                                <circle class="bar" id="habitRing" cx="18" cy="18" r="15.5" fill="none"
+                                    stroke="var(--good)" stroke-width="3"></circle>
+                            </svg>
+                        </div>
+                    </div>
+
+                    <div class="spacer"></div>
+
+                    <div class="row">
+                        <div>
+                            <div class="kicker">Next up</div>
+                            <div class="h2" id="nextUpTitle">No deadlines yet</div>
+                            <div class="meta" id="nextUpMeta">Add an assignment to start.</div>
+                        </div>
+                        <span class="badge" id="nextUpBadge">—</span>
+                    </div>
+
+                    <div class="pillRow">
+                        <span class="badge" id="overdueBadge">Overdue: 0</span>
+                        <span class="badge" id="weekBadge">This week: 0</span>
+                        <span class="badge good" id="streakBadge">Streak: 0d</span>
+                    </div>
+
+                    <button class="primary" id="startFocus">Start Focus</button>
+                </div>
+
+                <div class="card">
+                    <div class="row">
+                        <div>
+                            <div class="kicker">Quick habits</div>
+                            <div class="h2">Tap to complete</div>
+                            <div class="meta">Fast, satisfying, and still classy.</div>
+                        </div>
+                        <button class="ghostBtn" data-open-sheet="addHabit">Add</button>
+                    </div>
+                    <div class="pillRow" id="habitQuickList"></div>
+                </div>
+
+                <div class="card">
+                    <div class="row">
+                        <div>
+                            <div class="kicker">Quick add</div>
+                            <div class="h2">Assignments</div>
+                            <div class="meta">Keep school under control.</div>
+                        </div>
+                        <button class="ghostBtn" data-open-sheet="addAssignment">Add</button>
+                    </div>
+
+                    <div class="stack smallGap" id="todayAssignmentPreview"></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SCHOOL -->
+        <section class="view" data-view="school">
+            <header class="header">
+                <div class="titleWrap">
+                    <h1 class="title">School</h1>
+                    <p class="sub">Assignments with real due dates.</p>
+                </div>
+                <button class="iconBtn" data-open-sheet="addAssignment" aria-label="Add assignment">
+                    +
+                </button>
+            </header>
+
+            <div class="stack">
+                <div class="card">
+                    <div class="row">
+                        <div>
+                            <div class="kicker">Assignments</div>
+                            <div class="h2">Upcoming</div>
+                            <div class="meta">Tap to mark complete. Long-press later for edit (optional).</div>
+                        </div>
+                        <span class="badge" id="assignmentCountBadge">0</span>
+                    </div>
+
+                    <div class="spacer"></div>
+                    <div class="stack smallGap" id="assignmentList"></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- HABITS -->
+        <section class="view" data-view="habits">
+            <header class="header">
+                <div class="titleWrap">
+                    <h1 class="title">Habits</h1>
+                    <p class="sub">Streaks that feel premium.</p>
+                </div>
+                <button class="iconBtn" data-open-sheet="addHabit" aria-label="Add habit">
+                    +
+                </button>
+            </header>
+
+            <div class="stack">
+                <div class="card">
+                    <div class="row">
+                        <div>
+                            <div class="kicker">Today</div>
+                            <div class="h2">Your habits</div>
+                            <div class="meta">Tap a habit to toggle today.</div>
+                        </div>
+                        <span class="badge" id="habitOverviewBadge">0 / 0</span>
+                    </div>
+
+                    <div class="spacer"></div>
+                    <div class="stack smallGap" id="habitList"></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- FOCUS -->
+        <section class="view" data-view="focus">
+            <header class="header">
+                <div class="titleWrap">
+                    <h1 class="title">Focus</h1>
+                    <p class="sub">One session at a time.</p>
+                </div>
+            </header>
+
+            <div class="stack">
+                <div class="card">
+                    <div class="row">
+                        <div>
+                            <div class="kicker">Pomodoro</div>
+                            <div class="h2" id="timerLabel">25:00</div>
+                            <div class="meta" id="timerMeta">Deep work mode.</div>
+                        </div>
+                        <span class="badge" id="timerState">Ready</span>
+                    </div>
+
+                    <div class="spacer"></div>
+
+                    <div class="seg" aria-label="Timer length">
+                        <button class="active" data-len="25" type="button">25</button>
+                        <button data-len="50" type="button">50</button>
+                        <button data-len="90" type="button">90</button>
+                    </div>
+
+                    <div class="spacer"></div>
+
+                    <button class="primary" id="timerToggle">Start</button>
+                </div>
+
+                <div class="card">
+                    <div class="row">
+                        <div>
+                            <div class="kicker">Sessions</div>
+                            <div class="h2">Recent</div>
+                            <div class="meta">Auto-logged when you finish a timer.</div>
+                        </div>
+                    </div>
+                    <div class="spacer"></div>
+                    <div class="stack smallGap" id="sessionList"></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- INSIGHTS -->
+        <section class="view" data-view="insights">
+            <header class="header">
+                <div class="titleWrap">
+                    <h1 class="title">Insights</h1>
+                    <p class="sub">Trends without guilt.</p>
+                </div>
+            </header>
+
+            <div class="stack">
+                <div class="card">
+                    <div class="row">
+                        <div>
+                            <div class="kicker">Today</div>
+                            <div class="h2" id="insightHeadline">—</div>
+                            <div class="meta" id="insightMeta">—</div>
+                        </div>
+                        <span class="badge good" id="insightDelta">+0%</span>
+                    </div>
+
+                    <div class="spacer"></div>
+
+                    <div class="item">
+                        <div>
+                            <p class="itemTitle">Study minutes</p>
+                            <p class="itemSub" id="insStudy">0 minutes</p>
+                        </div>
+                        <div class="itemRight">
+                            <span class="badge" id="insStudyBadge">0m</span>
+                        </div>
+                    </div>
+
+                    <div class="smallSpacer"></div>
+
+                    <div class="item">
+                        <div>
+                            <p class="itemTitle">Habit completion</p>
+                            <p class="itemSub" id="insHabits">0%</p>
+                        </div>
+                        <div class="itemRight">
+                            <span class="badge" id="insHabitBadge">0%</span>
+                        </div>
+                    </div>
+
+                    <div class="smallSpacer"></div>
+
+                    <div class="item">
+                        <div>
+                            <p class="itemTitle">This week</p>
+                            <p class="itemSub" id="insWeek">—</p>
+                        </div>
+                        <div class="itemRight">
+                            <span class="badge" id="insWeekBadge">—</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Floating tab bar -->
+    <nav class="tabbar" aria-label="Tabs">
+        <div class="tab active" data-tab="today"><span class="tabIcon">⌂</span>Today</div>
+        <div class="tab" data-tab="school"><span class="tabIcon">≡</span>School</div>
+        <div class="tab" data-tab="habits"><span class="tabIcon">✓</span>Habits</div>
+        <div class="tab" data-tab="focus"><span class="tabIcon">◷</span>Focus</div>
+        <div class="tab" data-tab="insights"><span class="tabIcon">▮▮</span>Insights</div>
+    </nav>
+
+    <!-- Bottom Sheet -->
+    <div class="sheetBackdrop" id="sheetBackdrop" aria-hidden="true"></div>
+
+    <section class="sheet" id="sheet" aria-hidden="true">
+        <header class="sheetHeader">
+            <div>
+                <div class="sheetTitle" id="sheetTitle">Add</div>
+                <div class="sheetSub" id="sheetSub">—</div>
+            </div>
+            <button class="iconBtn small" id="sheetClose" aria-label="Close">×</button>
+        </header>
+
+        <form class="sheetBody" id="sheetForm">
+            <!-- dynamic form injected by JS -->
+        </form>
+    </section>
+
+    <script src="app.js"></script>
+</body>
+
+</html>
