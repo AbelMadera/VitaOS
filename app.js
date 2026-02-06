@@ -10,6 +10,11 @@
 const $ = (q, el = document) => el.querySelector(q);
 const $$ = (q, el = document) => [...el.querySelectorAll(q)];
 const clamp = (n, a, b) => Math.max(a, Math.min(b, n));
+const escAttr = (s) => String(s)
+    .replaceAll("&", "&amp;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;");
 
 /* ---------- Dates ---------- */
 function pad2(n) { return String(n).padStart(2, "0"); }
@@ -55,7 +60,9 @@ const COLOR_PRESETS = [
     { id: "ocean", label: "Ocean", rgb: "10, 132, 255" },
     { id: "mint", label: "Mint", rgb: "52, 199, 89" },
     { id: "sunset", label: "Sunset", rgb: "255, 159, 10" },
-    { id: "rose", label: "Rose", rgb: "255, 59, 48" },
+    { id: "pink", label: "Pink", rgb: "255, 55, 95" },
+    { id: "red", label: "Red", rgb: "255, 59, 48" },
+    { id: "teal", label: "Teal", rgb: "48, 176, 199" },
     { id: "violet", label: "Violet", rgb: "99, 102, 241" },
 ];
 function uid() { return Math.random().toString(16).slice(2) + Date.now().toString(16); }
@@ -95,6 +102,10 @@ function saveState() {
 const state = loadState();
 if (!state.theme) state.theme = "light";
 if (!state.palette || !COLOR_PRESETS.some(p => p.id === state.palette)) state.palette = "ocean";
+const uiState = {
+    assignmentEditMode: false,
+    habitEditMode: false
+};
 
 /* ---------- Theme ---------- */
 function getPalette(id) {
@@ -243,6 +254,22 @@ function toggleHabitToday(habitId) {
     renderAll();
 }
 
+function updateHabit(habitId, title) {
+    const h = state.habits.find(x => x.id === habitId);
+    if (!h) return;
+    h.title = title;
+    saveState();
+    renderAll();
+}
+
+function deleteHabit(habitId) {
+    const idx = state.habits.findIndex(x => x.id === habitId);
+    if (idx < 0) return;
+    state.habits.splice(idx, 1);
+    saveState();
+    renderAll();
+}
+
 function computeStreak() {
     // streak across all habits: how many consecutive days ALL habits were completed?
     // (Feels more “Apple rings”)
@@ -276,6 +303,22 @@ function toggleAssignmentDone(id) {
     const a = state.assignments.find(x => x.id === id);
     if (!a) return;
     a.done = !a.done;
+    saveState();
+    renderAll();
+}
+
+function updateAssignment(id, patch) {
+    const a = state.assignments.find(x => x.id === id);
+    if (!a) return;
+    Object.assign(a, patch);
+    saveState();
+    renderAll();
+}
+
+function deleteAssignment(id) {
+    const idx = state.assignments.findIndex(x => x.id === id);
+    if (idx < 0) return;
+    state.assignments.splice(idx, 1);
     saveState();
     renderAll();
 }
@@ -330,8 +373,8 @@ const sheet = $("#sheet");
 const sheetBackdrop = $("#sheetBackdrop");
 const sheetForm = $("#sheetForm");
 
-function openSheet(type) {
-    // type: addHabit | addAssignment | appearance
+function openSheet(type, payload = {}) {
+    // type: addHabit | editHabit | addAssignment | editAssignment | appearance
     if (type === "appearance") {
         openAppearance();
         sheetBackdrop.classList.add("open");
@@ -341,23 +384,25 @@ function openSheet(type) {
         return;
     }
 
-    $("#sheetTitle").textContent = type === "addHabit" ? "Add Habit" : "Add Assignment";
-    $("#sheetSub").textContent = type === "addHabit"
-        ? "Daily habit • streak-ready"
-        : "Due date • clean control";
-
     sheetForm.innerHTML = "";
 
-    if (type === "addHabit") {
+    if (type === "addHabit" || type === "editHabit") {
+        const isEdit = type === "editHabit";
+        const habit = isEdit ? state.habits.find(h => h.id === payload.id) : null;
+        if (isEdit && !habit) return;
+
+        $("#sheetTitle").textContent = isEdit ? "Edit Habit" : "Add Habit";
+        $("#sheetSub").textContent = "Daily habit • streak-ready";
         sheetForm.innerHTML = `
       <div class="field">
         <label>Habit name</label>
-        <input class="input" name="title" placeholder="e.g. Code 30 minutes" required maxlength="60"/>
+        <input class="input" name="title" placeholder="e.g. Code 30 minutes" required maxlength="60" value="${isEdit ? escAttr(habit.title) : ""}"/>
       </div>
 
       <div class="sheetActions">
-        <button class="primary" type="submit">Add Habit</button>
+        <button class="primary" type="submit">${isEdit ? "Save Habit" : "Add Habit"}</button>
       </div>
+      ${isEdit ? `<button class="dangerBtn" id="deleteHabitBtn" type="button">Delete Habit</button>` : ""}
     `;
 
         sheetForm.onsubmit = (e) => {
@@ -366,34 +411,52 @@ function openSheet(type) {
             const title = String(fd.get("title") || "").trim();
             if (!title) return;
 
-            state.habits.unshift({ id: uid(), title, history: {} });
-            saveState();
+            if (isEdit) updateHabit(habit.id, title);
+            else {
+                state.habits.unshift({ id: uid(), title, history: {} });
+                saveState();
+                renderAll();
+            }
             closeSheet();
-            renderAll();
         };
+
+        if (isEdit) {
+            $("#deleteHabitBtn")?.addEventListener("click", () => {
+                if (!window.confirm("Delete this habit?")) return;
+                deleteHabit(habit.id);
+                closeSheet();
+            });
+        }
     }
 
-    if (type === "addAssignment") {
+    if (type === "addAssignment" || type === "editAssignment") {
+        const isEdit = type === "editAssignment";
+        const assignment = isEdit ? state.assignments.find(a => a.id === payload.id) : null;
+        if (isEdit && !assignment) return;
+
         const todayISO = toISODate(new Date());
+        $("#sheetTitle").textContent = isEdit ? "Edit Assignment" : "Add Assignment";
+        $("#sheetSub").textContent = "Due date • clean control";
         sheetForm.innerHTML = `
       <div class="field">
         <label>Title</label>
-        <input class="input" name="title" placeholder="e.g. HW 3 (BST)" required maxlength="80"/>
+        <input class="input" name="title" placeholder="e.g. HW 3 (BST)" required maxlength="80" value="${isEdit ? escAttr(assignment.title) : ""}"/>
       </div>
 
       <div class="field">
         <label>Course (optional)</label>
-        <input class="input" name="course" placeholder="e.g. Data Structures" maxlength="40"/>
+        <input class="input" name="course" placeholder="e.g. Data Structures" maxlength="40" value="${isEdit ? escAttr(assignment.course || "") : ""}"/>
       </div>
 
       <div class="field">
         <label>Due date</label>
-        <input class="input" name="dueISO" type="date" value="${todayISO}" required />
+        <input class="input" name="dueISO" type="date" value="${isEdit ? assignment.dueISO : todayISO}" required />
       </div>
 
       <div class="sheetActions">
-        <button class="primary" type="submit">Add Assignment</button>
+        <button class="primary" type="submit">${isEdit ? "Save Assignment" : "Add Assignment"}</button>
       </div>
+      ${isEdit ? `<button class="dangerBtn" id="deleteAssignmentBtn" type="button">Delete Assignment</button>` : ""}
     `;
 
         sheetForm.onsubmit = (e) => {
@@ -404,11 +467,22 @@ function openSheet(type) {
             const dueISO = String(fd.get("dueISO") || "").trim();
             if (!title || !dueISO) return;
 
-            state.assignments.unshift({ id: uid(), title, course, dueISO, done: false });
-            saveState();
+            if (isEdit) updateAssignment(assignment.id, { title, course, dueISO });
+            else {
+                state.assignments.unshift({ id: uid(), title, course, dueISO, done: false });
+                saveState();
+                renderAll();
+            }
             closeSheet();
-            renderAll();
         };
+
+        if (isEdit) {
+            $("#deleteAssignmentBtn")?.addEventListener("click", () => {
+                if (!window.confirm("Delete this assignment?")) return;
+                deleteAssignment(assignment.id);
+                closeSheet();
+            });
+        }
     }
 
     sheetBackdrop.classList.add("open");
@@ -595,7 +669,7 @@ function renderToday() {
     }
 }
 
-function renderAssignmentItem(a) {
+function renderAssignmentItem(a, showActions = false) {
     const item = document.createElement("div");
     item.className = "item";
 
@@ -624,17 +698,34 @@ function renderAssignmentItem(a) {
     }
 
     item.innerHTML = `
-    <div>
+    <div class="itemMain">
+      <div>
       <p class="itemTitle">${a.title}</p>
       <p class="itemSub">${sub}</p>
+      </div>
+      <div class="itemRight">
+        <span class="${badgeClass}">${badgeText}</span>
+        <span class="badge">${a.done ? "Done" : "Tap"}</span>
+      </div>
     </div>
-    <div class="itemRight">
-      <span class="${badgeClass}">${badgeText}</span>
-      <span class="badge">${a.done ? "Done" : "Tap"}</span>
-    </div>
+    ${showActions ? `
+      <div class="itemActions">
+        <button class="miniBtn" type="button">Edit</button>
+        <button class="miniBtn danger" type="button">Delete</button>
+      </div>
+    ` : ""}
   `;
 
-    item.onclick = () => toggleAssignmentDone(a.id);
+    item.querySelector(".itemMain")?.addEventListener("click", () => toggleAssignmentDone(a.id));
+    item.querySelector(".miniBtn")?.addEventListener("click", (e) => {
+        e.stopPropagation();
+        openSheet("editAssignment", { id: a.id });
+    });
+    item.querySelector(".miniBtn.danger")?.addEventListener("click", (e) => {
+        e.stopPropagation();
+        if (!window.confirm("Delete this assignment?")) return;
+        deleteAssignment(a.id);
+    });
     return item;
 }
 
@@ -644,6 +735,11 @@ function renderSchool() {
 
     const all = sortedAssignments();
     $("#assignmentCountBadge").textContent = `${all.filter(a => !a.done).length} open`;
+    const editToggle = $("#assignmentEditToggle");
+    if (editToggle) {
+        editToggle.textContent = uiState.assignmentEditMode ? "Done" : "Edit";
+        editToggle.classList.toggle("active", uiState.assignmentEditMode);
+    }
 
     if (all.length === 0) {
         const e = document.createElement("div");
@@ -654,7 +750,7 @@ function renderSchool() {
     }
 
     all.forEach(a => {
-        const item = renderAssignmentItem(a);
+        const item = renderAssignmentItem(a, uiState.assignmentEditMode);
         if (a.done) item.style.opacity = "0.65";
         list.appendChild(item);
     });
@@ -668,6 +764,11 @@ function renderHabits() {
     const total = state.habits.length;
     const done = state.habits.filter(h => habitDoneToday(h, isoToday)).length;
     $("#habitOverviewBadge").textContent = `${done} / ${total}`;
+    const editToggle = $("#habitEditToggle");
+    if (editToggle) {
+        editToggle.textContent = uiState.habitEditMode ? "Done" : "Edit";
+        editToggle.classList.toggle("active", uiState.habitEditMode);
+    }
 
     if (total === 0) {
         const e = document.createElement("div");
@@ -682,16 +783,33 @@ function renderHabits() {
         const item = document.createElement("div");
         item.className = "item";
         item.innerHTML = `
-      <div>
-        <p class="itemTitle">${h.title}</p>
-        <p class="itemSub">${isDone ? "Completed today" : "Not done yet"}</p>
+      <div class="itemMain">
+        <div>
+          <p class="itemTitle">${h.title}</p>
+          <p class="itemSub">${isDone ? "Completed today" : "Not done yet"}</p>
+        </div>
+        <div class="itemRight">
+          <span class="${isDone ? "badge good" : "badge"}">${isDone ? "Done" : "Tap"}</span>
+          <span class="badge">${"Daily"}</span>
+        </div>
       </div>
-      <div class="itemRight">
-        <span class="${isDone ? "badge good" : "badge"}">${isDone ? "Done" : "Tap"}</span>
-        <span class="badge">${"Daily"}</span>
-      </div>
+      ${uiState.habitEditMode ? `
+        <div class="itemActions">
+          <button class="miniBtn" type="button">Edit</button>
+          <button class="miniBtn danger" type="button">Delete</button>
+        </div>
+      ` : ""}
     `;
-        item.onclick = () => toggleHabitToday(h.id);
+        item.querySelector(".itemMain")?.addEventListener("click", () => toggleHabitToday(h.id));
+        item.querySelector(".miniBtn")?.addEventListener("click", (e) => {
+            e.stopPropagation();
+            openSheet("editHabit", { id: h.id });
+        });
+        item.querySelector(".miniBtn.danger")?.addEventListener("click", (e) => {
+            e.stopPropagation();
+            if (!window.confirm("Delete this habit?")) return;
+            deleteHabit(h.id);
+        });
         list.appendChild(item);
     });
 }
@@ -760,6 +878,14 @@ function wireEvents() {
     // Today -> Focus
     $("#startFocus").addEventListener("click", () => setView("focus"));
     $("#seeMoreAssignments").addEventListener("click", () => setView("school"));
+    $("#assignmentEditToggle")?.addEventListener("click", () => {
+        uiState.assignmentEditMode = !uiState.assignmentEditMode;
+        renderAll();
+    });
+    $("#habitEditToggle")?.addEventListener("click", () => {
+        uiState.habitEditMode = !uiState.habitEditMode;
+        renderAll();
+    });
 
     // timer length
     $$(".seg button[data-len]").forEach(btn => {

@@ -437,9 +437,29 @@ body {
     transform: var(--tap);
 }
 
+.ghostBtn.compact {
+    min-height: 32px;
+    padding: 6px 10px;
+    border-radius: 11px;
+    font-size: 12px;
+}
+
+.ghostBtn.compact.active {
+    color: var(--text);
+    background: rgba(var(--accent-rgb), .16);
+    border-color: rgba(var(--accent-rgb), .35);
+}
+
 .seeMoreBtn {
     width: 100%;
     margin-top: 10px;
+}
+
+.rowActions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex: 0 0 auto;
 }
 
 .item {
@@ -458,6 +478,42 @@ body {
 }
 
 .item:active {
+    transform: var(--tap);
+}
+
+.itemMain {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+    align-items: center;
+    cursor: pointer;
+}
+
+.itemActions {
+    display: flex;
+    gap: 8px;
+    margin-top: 10px;
+}
+
+.miniBtn {
+    border: 1px solid var(--stroke);
+    background: rgba(255, 255, 255, .04);
+    color: var(--text);
+    font-weight: 760;
+    border-radius: 12px;
+    min-height: 34px;
+    padding: 7px 10px;
+    cursor: pointer;
+    transition: transform var(--dur-fast) var(--ease), background var(--dur-fast) var(--ease);
+}
+
+.miniBtn.danger {
+    color: var(--bad);
+    background: rgba(255, 59, 48, .08);
+}
+
+.miniBtn:active {
     transform: var(--tap);
 }
 

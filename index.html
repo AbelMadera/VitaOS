@@ -124,9 +124,12 @@
                         <div>
                             <div class="kicker">Assignments</div>
                             <div class="h2">Upcoming</div>
-                            <div class="meta">Tap to mark complete. Long-press later for edit (optional).</div>
+                            <div class="meta">Tap to mark complete. Tap Edit to manage items.</div>
                         </div>
-                        <span class="badge" id="assignmentCountBadge">0</span>
+                        <div class="rowActions">
+                            <button class="ghostBtn compact" id="assignmentEditToggle" type="button">Edit</button>
+                            <span class="badge" id="assignmentCountBadge">0</span>
+                        </div>
                     </div>
 
                     <div class="spacer"></div>
@@ -153,9 +156,12 @@
                         <div>
                             <div class="kicker">Today</div>
                             <div class="h2">Your habits</div>
-                            <div class="meta">Tap a habit to toggle today.</div>
+                            <div class="meta">Tap a habit to toggle today. Tap Edit to manage habits.</div>
                         </div>
-                        <span class="badge" id="habitOverviewBadge">0 / 0</span>
+                        <div class="rowActions">
+                            <button class="ghostBtn compact" id="habitEditToggle" type="button">Edit</button>
+                            <span class="badge" id="habitOverviewBadge">0 / 0</span>
+                        </div>
                     </div>
 
                     <div class="spacer"></div>
