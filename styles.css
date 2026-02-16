@@ -557,6 +557,24 @@ body {
     flex: 0 0 auto;
 }
 
+.assignmentItem.done {
+    background: color-mix(in srgb, rgba(52, 199, 89, .16) 70%, rgba(255, 255, 255, .04));
+    border-color: color-mix(in srgb, var(--good) 40%, var(--stroke));
+}
+
+.itemTitle.isDone {
+    text-decoration: line-through;
+    text-decoration-thickness: 1.5px;
+    text-decoration-color: color-mix(in srgb, var(--good) 65%, transparent);
+    opacity: .86;
+}
+
+.doneCheck {
+    color: var(--good);
+    margin-right: 6px;
+    font-weight: 900;
+}
+
 .seg {
     display: flex;
     gap: 4px;
@@ -593,6 +611,45 @@ body {
 
 html[data-theme="dark"] .seg button.active {
     background: linear-gradient(180deg, rgba(255, 255, 255, .12), rgba(255, 255, 255, .07));
+}
+
+.timerCustom {
+    display: grid;
+    grid-template-columns: 1fr 1fr auto;
+    gap: 8px;
+    align-items: end;
+}
+
+.pickerCol {
+    min-width: 0;
+}
+
+.pickerLabel {
+    display: block;
+    margin: 0 0 6px;
+}
+
+.timerPickerSelect {
+    min-height: 42px;
+    padding: 8px 10px;
+    font-size: 15px;
+    appearance: none;
+}
+
+.timerCustom .ghostBtn.compact {
+    min-height: 42px;
+    padding-inline: 14px;
+}
+
+@media (max-width: 380px) {
+    .timerCustom {
+        grid-template-columns: 1fr 1fr;
+        align-items: start;
+    }
+
+    .timerCustom .ghostBtn.compact {
+        grid-column: 1 / -1;
+    }
 }
 
 .tabbar {

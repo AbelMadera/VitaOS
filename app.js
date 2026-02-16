@@ -514,6 +514,46 @@ const timerState = {
     intervalId: null
 };
 
+function syncTimerPicker(minutes) {
+    const h = Math.floor(minutes / 60);
+    const m = minutes % 60;
+    const hourSel = $("#customTimerHours");
+    const minSel = $("#customTimerMins");
+    if (hourSel) hourSel.value = String(h);
+    if (minSel) minSel.value = String(m);
+}
+
+function populateTimerPicker() {
+    const hourSel = $("#customTimerHours");
+    const minSel = $("#customTimerMins");
+    if (!hourSel || !minSel) return;
+
+    hourSel.innerHTML = Array.from({ length: 11 }, (_, i) => `<option value="${i}">${i}h</option>`).join("");
+    minSel.innerHTML = Array.from({ length: 60 }, (_, i) => `<option value="${i}">${String(i).padStart(2, "0")}m</option>`).join("");
+}
+
+function setTimerMinutes(minutes, fromCustom = false) {
+    const m = clamp(Math.round(Number(minutes) || 0), 1, 600);
+    timerState.minutes = m;
+    $("#timerLabel").textContent = `${String(m).padStart(2, "0")}:00`;
+    syncTimerPicker(m);
+    $$(".seg button[data-len]").forEach(b => b.classList.toggle("active", Number(b.dataset.len) === m));
+    $("#timerMeta").textContent = fromCustom ? `Custom timer set to ${m} minute(s).` : "Deep work mode.";
+}
+
+function applyCustomTimer() {
+    if (timerState.running) return;
+    const hours = Number($("#customTimerHours")?.value ?? "0");
+    const mins = Number($("#customTimerMins")?.value ?? "0");
+    const raw = (hours * 60) + mins;
+    if (!Number.isFinite(raw) || raw < 1 || raw > 600) {
+        $("#timerMeta").textContent = "Enter a custom timer between 1 and 600 minutes.";
+        $("#customTimerHours")?.focus();
+        return;
+    }
+    setTimerMinutes(raw, true);
+}
+
 function fmt(ms) {
     const s = Math.max(0, Math.floor(ms / 1000));
     const m = Math.floor(s / 60);
@@ -671,41 +711,51 @@ function renderToday() {
 
 function renderAssignmentItem(a, showActions = false) {
     const item = document.createElement("div");
-    item.className = "item";
+    item.className = "item assignmentItem" + (a.done ? " done" : "");
 
     const today = parseISODate(toISODate(new Date()));
     const due = parseISODate(a.dueISO);
     const diff = daysBetween(today, due);
 
-    let badgeText = `${formatFriendlyDate(a.dueISO)}`;
-    let badgeClass = "badge";
+    let badgeText;
+    let badgeClass;
     let sub = a.course ? a.course : "Assignment";
 
-    if (diff < 0) {
-        badgeText = "Late";
-        badgeClass = "badge bad";
-        sub += ` • overdue by ${Math.abs(diff)} day(s)`;
-    } else if (diff === 0) {
-        badgeText = "Today";
-        badgeClass = "badge warn";
-        sub += " • due today";
-    } else if (diff === 1) {
-        badgeText = "Tomorrow";
-        badgeClass = "badge warn";
-        sub += " • due tomorrow";
+    if (a.done) {
+        badgeText = "Completed";
+        badgeClass = "badge good";
+        sub += " • marked done";
     } else {
-        sub += ` • due in ${diff} day(s)`;
+        badgeText = `${formatFriendlyDate(a.dueISO)}`;
+        badgeClass = "badge";
+        if (diff < 0) {
+            badgeText = "Late";
+            badgeClass = "badge bad";
+            sub += ` • overdue by ${Math.abs(diff)} day(s)`;
+        } else if (diff === 0) {
+            badgeText = "Today";
+            badgeClass = "badge warn";
+            sub += " • due today";
+        } else if (diff === 1) {
+            badgeText = "Tomorrow";
+            badgeClass = "badge warn";
+            sub += " • due tomorrow";
+        } else {
+            sub += ` • due in ${diff} day(s)`;
+        }
     }
 
     item.innerHTML = `
     <div class="itemMain">
       <div>
-      <p class="itemTitle">${a.title}</p>
+      <p class="itemTitle${a.done ? " isDone" : ""}">
+        ${a.done ? `<span class="doneCheck" aria-hidden="true">✓</span>` : ""}${a.title}
+      </p>
       <p class="itemSub">${sub}</p>
       </div>
       <div class="itemRight">
         <span class="${badgeClass}">${badgeText}</span>
-        <span class="badge">${a.done ? "Done" : "Tap"}</span>
+        <span class="badge">${a.done ? "Tap to undo" : "Tap to mark done"}</span>
       </div>
     </div>
     ${showActions ? `
@@ -751,7 +801,6 @@ function renderSchool() {
 
     all.forEach(a => {
         const item = renderAssignmentItem(a, uiState.assignmentEditMode);
-        if (a.done) item.style.opacity = "0.65";
         list.appendChild(item);
     });
 }
@@ -891,10 +940,18 @@ function wireEvents() {
     $$(".seg button[data-len]").forEach(btn => {
         btn.addEventListener("click", () => {
             if (timerState.running) return;
-            $$(".seg button[data-len]").forEach(b => b.classList.toggle("active", b === btn));
-            timerState.minutes = Number(btn.dataset.len);
-            $("#timerLabel").textContent = `${String(timerState.minutes).padStart(2, "0")}:00`;
+            setTimerMinutes(Number(btn.dataset.len));
         });
+    });
+
+    $("#setCustomTimer")?.addEventListener("click", applyCustomTimer);
+    $("#customTimerHours")?.addEventListener("change", () => {
+        if (timerState.running) return;
+        applyCustomTimer();
+    });
+    $("#customTimerMins")?.addEventListener("change", () => {
+        if (timerState.running) return;
+        applyCustomTimer();
     });
 
     // timer start/stop/reset
@@ -921,6 +978,8 @@ function wireEvents() {
 /* ---------- Init ---------- */
 function init() {
     setThemeAndPalette();
+    populateTimerPicker();
+    setTimerMinutes(timerState.minutes);
     wireEvents();
     renderAll();
 }
