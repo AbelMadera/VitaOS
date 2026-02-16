@@ -1,16 +1,27 @@
 <!doctype html>
-<html lang="en" data-theme="light">
+<html lang="en">
 
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
     <title>VitaOS</title>
-    <meta name="theme-color" content="#f6f7fb" />
+    <meta name="theme-color" content="#070a12" />
     <link rel="apple-touch-icon" href="images/app-icon.png" />
     <link rel="icon" type="image/png" href="images/app-icon.png" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
     <meta name="apple-mobile-web-app-title" content="VitaOS" />
+    <script>
+        (() => {
+            try {
+                const t = localStorage.getItem("lifeos_theme");
+                if (t !== "dark" && t !== "light") return;
+                document.documentElement.setAttribute("data-theme", t);
+                const metaThemeColor = document.querySelector('meta[name="theme-color"]');
+                if (metaThemeColor) metaThemeColor.setAttribute("content", t === "dark" ? "#070a12" : "#f6f7fb");
+            } catch (_) { }
+        })();
+    </script>
     <link rel="stylesheet" href="styles.css" />
 </head>
 

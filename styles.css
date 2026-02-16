@@ -73,6 +73,14 @@ html[data-theme="dark"] {
     box-sizing: border-box;
 }
 
+html {
+    background-color: #070a12;
+}
+
+html[data-theme="light"] {
+    background-color: #f6f7fb;
+}
+
 html,
 body {
     height: 100%;
