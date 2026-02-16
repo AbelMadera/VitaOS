@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
     <title>VitaOS</title>
     <meta name="theme-color" content="#070a12" />
+    <meta name="color-scheme" content="dark" />
     <link rel="apple-touch-icon" href="images/app-icon.png" />
     <link rel="icon" type="image/png" href="images/app-icon.png" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -18,7 +19,7 @@
                 if (t !== "dark" && t !== "light") return;
                 document.documentElement.setAttribute("data-theme", t);
                 const metaThemeColor = document.querySelector('meta[name="theme-color"]');
-                if (metaThemeColor) metaThemeColor.setAttribute("content", t === "dark" ? "#070a12" : "#f6f7fb");
+                if (metaThemeColor) metaThemeColor.setAttribute("content", "#070a12");
             } catch (_) { }
         })();
     </script>

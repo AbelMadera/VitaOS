@@ -129,7 +129,7 @@ function setTheme(t, persist = true) {
     if (persist) localStorage.setItem("lifeos_theme", t);
     const themeColor = $('meta[name="theme-color"]');
     if (themeColor) {
-        themeColor.setAttribute("content", t === "dark" ? "#070a12" : "#f6f7fb");
+        themeColor.setAttribute("content", "#070a12");
     }
     if (persist) saveState();
 }
